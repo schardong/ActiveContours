@@ -6,6 +6,7 @@ Yc = [];
 n = 0;
 idealRatio = 1 / (4 * pi);  %Area / Perimeter^2
 ratio = 1;
+
 % Loop, picking up the points.
 disp('Left mouse button picks points.')
 disp('Right mouse button picks last point.')
@@ -23,7 +24,6 @@ end
 % Interpolate with a spline curve and finer spacing.
 pp = spline(1:n, [Xc; Yc]);
 rPoints = ppval(pp, 1:0.1:n);
-polyarea(rPoints(1, :), rPoints(2, :));
 [geom, ~, ~] = polygeom(rPoints(1, :), rPoints(2, :));
 ratio = geom(1) / (geom(4)*geom(4));
 
