@@ -29,20 +29,20 @@ rPoints = spline(1:n, [Xc; Yc], 1:0.1:n);
 constArea = geom(1);
 distance = zeros(size(Xc));
 % Interpolate with a spline curve and finer spacing.
-while ratio - idealRatio > 0.1% || abs(oldRatio - ratio) < 0.01
-    area = 0;
-    n = 0;
-    while n < size(distance);
-        n = n + 1;
-    end
-    while abs(constArea - area) >= 0.5
-        
-    end
+%while ratio - idealRatio > 0.1 || abs(oldRatio - ratio) < 0.01
+%    area = 0;
+%    n = 0;
+%    while n < size(distance);
+%        n = n + 1;
+%    end
+%    while abs(constArea - area) >= 0.5
+%        
+%    end
     rPoints = spline(1:n, [Xc; Yc], 1:0.1:n);
     [geom, ~, ~] = polygeom(rPoints(1, :), rPoints(2, :));
     oldRatio = ratio;
     ratio = geom(1) / (geom(4)*geom(4));
-end
+%end
 
 % Plot the interpolated curve.
 plot(rPoints(1, :), rPoints(2, :), 'b-');
