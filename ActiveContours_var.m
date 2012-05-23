@@ -19,8 +19,6 @@ while i <= n
     len(i) = norm([Xc(i) Yc(i)] - centroid);
     i = i + 1;
 end
-initMean = mean(len);
-initStdDev = std(len);
 
 it = 1;
 while abs(ratio(it) - (4 * pi)) > 0.5 && abs(ratio(it + 1) - ratio(it)) ...
