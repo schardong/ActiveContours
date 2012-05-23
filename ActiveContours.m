@@ -1,49 +1,66 @@
 axis([0 1 0 1])
 hold on
-% Initially, the list of points is empty.
-Xc = [];
-Yc = [];
-n = 0;
-idealRatio = 1 / (4 * pi);  %Area / Perimeter^2
+idealRatio = 4 * pi;
 ratio = 1;
 oldRatio = 0;
 area = 0;
 
-% Loop, picking up the points.
-disp('Left mouse button picks points.')
-disp('Right mouse button picks last point.')
-but = 1;
-while but == 1
-    n = n + 1;
-    [Xc(n), Yc(n), but] = ginput(1);
-    if but ~= 1
-        Xc(n) = Xc(1);
-        Yc(n) = Yc(1);
-        break;
+[Xc Yc n] = pickControlPoints();
+
+%Construction of the initial curve.
+rPoints = spline(1:n, [Xc; Yc], 1:0.1:n);
+plot(rPoints(1, :), rPoints(2, :), 'b-');
+[geom, ~, ~] = polygeom(rPoints(1, :), rPoints(2, :));
+centroid = [geom(2) geom(3)];
+plot(geom(2), geom(3), 'x');
+constArea = geom(1);
+
+%Move the control points closer to a circle.
+while abs(ratio - idealRatio) > 0.5% || abs(ratio - oldRatio) > 0.01
+    %centroid = [geom(2) geom(3)];
+    i = 1;
+    bigLen = 0;
+    bigIdx = 0;
+    smlLen = 1;
+    smlIdx = 0;
+    %Search for the farthest and the closest points from the centroid.
+    while i <= n
+        len = norm([Xc(i) Yc(i)] - centroid);
+        if len > bigLen
+            bigLen = len;
+            bigIdx = i;
+        end
+        if len < smlLen
+            smlLen = len;
+            smlIdx = i;
+        end
+        i = i + 1;
     end
-    plot(Xc(n), Yc(n), 'ro');
+    
+    %Move the farthest point closer to the centroid.
+    currPoint = centroid - [Xc(bigIdx) Yc(bigIdx)];
+    distanceToMove = norm(currPoint) * 0.1;
+    currPoint = currPoint * distanceToMove;
+    Xc(bigIdx) = Xc(bigIdx) + currPoint(1);
+    Yc(bigIdx) = Yc(bigIdx) + currPoint(2);
+    plot(Xc(bigIdx), Yc(bigIdx), 'go');
+    
+    %Move the closest point farther away from the centroid.
+    currPoint = [Xc(smlIdx) Yc(smlIdx)] - centroid;
+    distanceToMove = norm(currPoint) * 0.1;
+    currPoint = currPoint * distanceToMove;
+    Xc(smlIdx) = Xc(smlIdx) + currPoint(1);
+    Yc(smlIdx) = Yc(smlIdx) + currPoint(2);
+    plot(Xc(smlIdx), Yc(smlIdx), 'go');
+    
+    %Reconstructing the curve.
+    rPoints = spline(1:n, [Xc; Yc], 1:0.1:n);
+    plot(rPoints(1, :), rPoints(2, :), 'b-');
+    [geom, ~, ~] = polygeom(rPoints(1, :), rPoints(2, :));
+    %plot(geom(2), geom(3), 'x');
+    area = geom(1);
+    oldRatio = ratio;
+    ratio = (geom(4) * geom(4)) / area;
 end
 
-rPoints = spline(1:n, [Xc; Yc], 1:0.1:n);
-[geom, ~, ~] = polygeom(rPoints(1, :), rPoints(2, :));
-constArea = geom(1);
-distance = zeros(size(Xc));
-% Interpolate with a spline curve and finer spacing.
-%while ratio - idealRatio > 0.1 || abs(oldRatio - ratio) < 0.01
-%    area = 0;
-%    n = 0;
-%    while n < size(distance);
-%        n = n + 1;
-%    end
-%    while abs(constArea - area) >= 0.5
-%        
-%    end
-    rPoints = spline(1:n, [Xc; Yc], 1:0.1:n);
-    [geom, ~, ~] = polygeom(rPoints(1, :), rPoints(2, :));
-    oldRatio = ratio;
-    ratio = geom(1) / (geom(4)*geom(4));
-%end
-
-% Plot the interpolated curve.
-plot(rPoints(1, :), rPoints(2, :), 'b-');
 hold off
