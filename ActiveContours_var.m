@@ -1,6 +1,6 @@
 axis([0 1 0 1])
 hold on
-ratio = [0 1];
+ratio = [1 2];
 areas = [];
 
 [Xc Yc n] = pickControlPoints();
@@ -21,8 +21,7 @@ while i <= n
 end
 
 it = 1;
-while abs(ratio(it) - (4 * pi)) > 0.5 && abs(ratio(it + 1) - ratio(it)) ...
-        > 0.2
+while ratio(it+1) > 0.1 && abs(ratio(it + 1) - ratio(it)) > 0.05
     i = 1;
     len = zeros(1, n);
     %Calculates the distance between each contol point and the centroid.
@@ -34,7 +33,7 @@ while abs(ratio(it) - (4 * pi)) > 0.5 && abs(ratio(it + 1) - ratio(it)) ...
     while i <= n
         currPoint = ([Xc(i) Yc(i)] - centroid) / norm([Xc(i) Yc(i)] ...
                                                       - centroid) * ...
-            std(len);
+            std(len) * 0.5;
         if len(i) < mean(len)
             Xc(i) = Xc(i) + currPoint(1);
             Yc(i) = Yc(i) + currPoint(2);
@@ -52,7 +51,7 @@ while abs(ratio(it) - (4 * pi)) > 0.5 && abs(ratio(it + 1) - ratio(it)) ...
     [geom, ~, ~] = polygeom(rPoints(1, :), rPoints(2, :));
     areas(it) = geom(1);
     it = it + 1;
-    ratio(it + 1) = (geom(4) * geom(4)) / geom(1);
+    ratio(it + 1) = (((geom(4) * geom(4)) / geom(1)) / (4 * pi)) - 1;
 end
 
 z = zeros(1, (n - 1) * 10 + 1);
